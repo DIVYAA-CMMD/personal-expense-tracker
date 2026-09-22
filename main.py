@@ -123,7 +123,7 @@ def delete_expense():
                 expense["category"]
             ])
 
-    print(f"\n✓ Deleted: {deleted['name']}")
+    print(f"\nDeleted: {deleted['name']}")
 def category_summary():
     if len(expenses) == 0:
         print("\nNo expenses recorded yet.")
@@ -143,8 +143,8 @@ def category_summary():
 
     for category, total in category_totals.items():
         print(f"{category}: ₹{total}")
-
-while True:
+choice = 0
+while choice!=8:
     print("================================")
     print("      PERSONAL EXPENSE TRACKER")
     print("================================")
@@ -180,4 +180,6 @@ while True:
         category_summary()
     elif choice == "8":
         print("\nThank you for using Personal Expense Tracker!")
-        break
+    else:
+        print("\ninvalid input please give in range of 1-8")
+        
