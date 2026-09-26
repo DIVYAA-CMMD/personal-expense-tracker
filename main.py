@@ -1,29 +1,52 @@
-import csv
 import os
+import csv
 
 
 expenses = []
 file_path = os.path.join(os.path.dirname(__file__), "expenses.csv")
 
-if os.path.exists(file_path):
-    with open(file_path, "r", newline="") as file:
-        reader = csv.reader(file)
+def load_expenses():
+    try:
+        with open(file_path, "r", newline="") as file:
+            reader = csv.reader(file)
 
-        for row in reader:
-            expense = {
-                "name": row[0],
-                "amount": float(row[1]),
-                "category": row[2]
-            }
+            for row in reader:
+                if len(row) == 3:
+                    expense = {
+                        "name": row[0],
+                        "amount": float(row[1]),
+                        "category": row[2]
+                    }
 
-            expenses.append(expense)
+                    expenses.append(expense)
+    except FileNotFoundError:
+        pass
+
+
+def save_expenses():
+    with open(file_path, "w", newline="") as file:
+        writer = csv.writer(file)
+
+        for expense in expenses:
+            writer.writerow([
+                expense["name"],
+                expense["amount"],
+                expense["category"]
+            ])
+
+
 def add_expense():
     name = input("Enter expense name: ")
+
+    if name.strip() == "":
+        print("Expense name cannot be empty.")
+        return
+
     try:
         amount = float(input("Enter amount: "))
 
         if amount <= 0:
-            print("Amount must be greater than 0.")
+            print("Please enter something greater than zero.")
             return
 
     except ValueError:
@@ -39,36 +62,40 @@ def add_expense():
     }
 
     expenses.append(expense)
+    save_expenses()
 
-    with open(file_path, "a", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow([name, amount, category])
+    print("\n Your expense is successfully added!")
 
-    print("\n✓ Expense added successfully!")
+
 def view_expenses():
-    if len(expenses) == 0:
+    if not expenses:
+    
         print("\nNo expenses recorded yet.")
     else:
-        print("\n========== YOUR EXPENSES ==========")
+        print("\n$$$$$$$$$$ YOUR EXPENSES $$$$$$$$$$")
 
         for i, expense in enumerate(expenses, start=1):
             print(f"\n{i}. {expense['name']}")
             print(f"   Amount: ₹{expense['amount']}")
             print(f"   Category: {expense['category']}")
 def search_by_category():
-    search_category = input("Enter category to search: ")
+    category = input("Enter category: ")
+
+    if category.strip() == "":
+        print("Category cannot be empty.")
+        return
 
     found = False
 
     for expense in expenses:
-        if expense["category"].lower() == search_category.lower():
+        if expense["category"].lower() == category.lower():
             print("\nExpense:", expense["name"])
             print("Amount: ₹", expense["amount"])
             print("Category:", expense["category"])
             found = True
 
     if not found:
-        print("\nNo expenses found in this category.")
+        print("\nThis category have no expenses.")
 def show_total():
     total = 0
 
@@ -77,8 +104,8 @@ def show_total():
 
     print("\nTotal Spending: ₹", total)
 def show_highest():
-    if len(expenses) == 0:
-        print("\nNo expenses recorded yet.")
+    if not expenses:
+        print("\nNo expenses to show here.")
     else:
         highest = expenses[0]
 
@@ -91,11 +118,11 @@ def show_highest():
         print("Amount: ₹", highest["amount"])
         print("Category:", highest["category"])
 def delete_expense():
-    if len(expenses) == 0:
-        print("\nNo expenses to delete.")
+    if not expenses:
+        print("\nNo expenses to delete here.")
         return
 
-    print("\n========== YOUR EXPENSES ==========")
+    print("\n__________ YOUR EXPENSES __________")
 
     for i, expense in enumerate(expenses, start=1):
         print(f"{i}. {expense['name']} - ₹{expense['amount']} - {expense['category']}")
@@ -104,29 +131,21 @@ def delete_expense():
         choice = int(input("\nEnter the expense number to delete: "))
 
         if choice < 1 or choice > len(expenses):
-            print("\nInvalid expense number.")
+            print("\nExpense number is invalid.")
             return
 
     except ValueError:
-        print("\nPlease enter a valid number.")
+        print("\nEnter a valid number please.")
         return
 
     deleted = expenses.pop(choice - 1)
 
-    with open(file_path, "w", newline="") as file:
-        writer = csv.writer(file)
-
-        for expense in expenses:
-            writer.writerow([
-                expense["name"],
-                expense["amount"],
-                expense["category"]
-            ])
+    save_expenses()
 
     print(f"\nDeleted: {deleted['name']}")
 def category_summary():
-    if len(expenses) == 0:
-        print("\nNo expenses recorded yet.")
+    if not expenses:
+        print("\nNo expenses to show here.")
         return
 
     category_totals = {}
@@ -139,15 +158,17 @@ def category_summary():
         else:
             category_totals[category] = expense["amount"]
 
-    print("\n========== CATEGORY SUMMARY ==========")
+    print("\n######### CATEGORY SUMMARY ###########")
 
     for category, total in category_totals.items():
         print(f"{category}: ₹{total}")
-choice = 0
-while choice!=8:
-    print("================================")
+load_expenses()
+
+while True:
+
+    print("//////////////////////////////////")
     print("      PERSONAL EXPENSE TRACKER")
-    print("================================")
+    print("/////////////////////////////////")
 
     print("\n1. Add Expense")
     print("2. View All Expenses")
@@ -179,7 +200,10 @@ while choice!=8:
     elif choice == "7":
         category_summary()
     elif choice == "8":
-        print("\nThank you for using Personal Expense Tracker!")
+
+
+        print("\nThank you for using Personal Expense Tracker. Have a great day!")
     else:
-        print("\ninvalid input please give in range of 1-8")
+        print("\nInvalid input. Please enter a number from 1 to 8.")
         
+
