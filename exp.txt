@@ -1,0 +1,4 @@
+departmental store,800.0,groceries
+necklace,1500.0,jewelery
+canteen,4325.0,food
+finland,12000.0,travel
